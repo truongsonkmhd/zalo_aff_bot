@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Chat thử bot</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%231f5fd6%27/%3E%3Cpath d=%27M8 10h16v10H14l-4 4v-4H8z%27 fill=%27none%27 stroke=%27white%27 stroke-width=%272.2%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="layout">
+    <!-- Khung chat giống Zalo -->
+    <section class="chat" aria-label="Cuộc trò chuyện với shop">
+      <header class="chat-head">
+        <span class="avatar" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M6 7h12l-1 13H7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
+        </span>
+        <div class="chat-title">
+          <strong>Shop (Zalo OA giả lập)</strong>
+          <span id="as-user">Bạn đang chat với tư cách khach-001</span>
+        </div>
+        <button id="clear-btn" class="ghost" type="button" title="Xóa khung chat (không xóa nhật ký bot)">Xóa chat</button>
+      </header>
+
+      <ol id="messages" class="messages" aria-live="polite">
+        <li class="sys">Gửi link sản phẩm Shopee, bot sẽ đổi sang link affiliate của shop. Nhắn <code>/id</code> để lấy mã tra cứu đơn.</li>
+      </ol>
+
+      <form id="chat-form" class="composer" autocomplete="off">
+        <label for="text" class="sr-only">Tin nhắn</label>
+        <textarea id="text" rows="1" maxlength="2000" placeholder="Nhập tin nhắn hoặc dán link Shopee…" required></textarea>
+        <button id="send" type="submit" aria-label="Gửi">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l16-8-6 16-2-7z"/></svg>
+        </button>
+      </form>
+    </section>
+
+    <!-- Bảng điều khiển thử nghiệm -->
+    <aside class="panel" aria-label="Công cụ thử nghiệm">
+      <div class="card">
+        <h2>Khách đang chat</h2>
+        <div class="seg" role="radiogroup" aria-label="Chọn khách">
+          <label><input type="radio" name="user" value="khach-001" checked><span>Khách 1</span></label>
+          <label><input type="radio" name="user" value="khach-002"><span>Khách 2</span></label>
+          <label><input type="radio" name="user" value="khach-003"><span>Khách 3</span></label>
+        </div>
+        <p class="hint">Mỗi khách có mã tra cứu và hạn mức riêng (<span id="limit">5</span> link/phút).</p>
+        <label class="switch">
+          <input id="fake-sig" type="checkbox">
+          <span>Giả làm kẻ xấu: gửi webhook với chữ ký sai</span>
+        </label>
+      </div>
+
+      <div class="card">
+        <h2>Tin mẫu</h2>
+        <div id="samples" class="samples"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>Nhật ký bot</h2>
+          <button id="refresh-btn" class="ghost small" type="button">Làm mới</button>
+        </div>
+        <p id="stats" class="stats">Chưa có lượt nào.</p>
+        <ul id="log" class="log"></ul>
+        <p class="hint">Nhật ký chỉ lưu mã băm của khách, không lưu nội dung tin.</p>
+      </div>
+    </aside>
+  </div>
+</body>
+</html>

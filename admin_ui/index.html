@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Bot Đổi Link · Quản trị</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%231f5fd6%27/%3E%3Cpath d=%27M13.3 18.7a5.3 5.3 0 0 0 7.5 0l4-4a5.3 5.3 0 0 0-7.5-7.5l-1.3 1.3M18.7 13.3a5.3 5.3 0 0 0-7.5 0l-4 4a5.3 5.3 0 0 0 7.5 7.5l1.3-1.3%27 fill=%27none%27 stroke=%27white%27 stroke-width=%272.4%27 stroke-linecap=%27round%27/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/admin/styles.css">
+  <script src="/admin/app.js" defer></script>
+</head>
+<body>
+  <!-- Màn hình đăng nhập -->
+  <section id="login-view" class="login" hidden>
+    <form id="login-form" class="login-card" autocomplete="off" novalidate>
+      <div class="brand brand-lg">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></svg>
+        </span>
+        <span>
+          <span class="brand-name">Bot Đổi Link</span>
+          <span class="brand-sub">Trang quản trị của shop</span>
+        </span>
+      </div>
+      <input type="text" name="username" value="admin" autocomplete="username" hidden aria-hidden="true">
+      <label class="field">
+        <span class="field-label">Mật khẩu quản trị</span>
+        <input id="login-password" type="password" autocomplete="current-password" required autofocus>
+      </label>
+      <p id="login-error" class="form-error" role="alert" hidden></p>
+      <button id="login-submit" class="btn btn-primary btn-block" type="submit">Đăng nhập</button>
+      <p id="login-setup" class="hint" hidden>
+        Chưa đặt mật khẩu quản trị. Chạy <code>python -m app.cli hash-password</code> rồi đặt
+        <code>ADMIN_PASSWORD_HASH</code> và khởi động lại bot.
+      </p>
+    </form>
+  </section>
+
+  <!-- Khung chính sau khi đăng nhập -->
+  <div id="shell" class="shell" hidden>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></svg>
+        </span>
+        <span class="brand-name">Bot Đổi Link</span>
+      </div>
+      <div id="health-pill" class="pill" role="status">Đang kiểm tra…</div>
+      <div class="topbar-actions">
+        <button id="theme-toggle" class="icon-btn" type="button" aria-label="Đổi giao diện sáng/tối" title="Giao diện sáng/tối">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        </button>
+        <a class="btn btn-ghost" href="/admin/don-gian/">Bản đơn giản</a>
+        <button id="logout-btn" class="btn btn-ghost" type="button">Đăng xuất</button>
+      </div>
+    </header>
+
+    <nav class="nav" aria-label="Điều hướng chính">
+      <a href="#tong-quan" data-view="tong-quan">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+        <span>Tổng quan</span>
+      </a>
+      <a href="#thong-ke" data-view="thong-ke">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></svg>
+        <span>Thống kê</span>
+      </a>
+      <a href="#lich-su" data-view="lich-su">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <span>Lịch sử đổi link</span>
+      </a>
+      <a href="#don-hang" data-view="don-hang">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v13H3z"/><path d="M3 7l2-4h14l2 4"/><path d="M9 12h6"/></svg>
+        <span>Đơn hàng</span>
+      </a>
+      <a href="#viec-loi" data-view="viec-loi">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l10 18H2z"/><path d="M12 10v4"/><path d="M12 17.5v.5"/></svg>
+        <span>Việc bị lỗi</span>
+        <span id="nav-dlq-badge" class="nav-badge" hidden></span>
+      </a>
+      <a href="#shopee" data-view="shopee">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l-1 13H7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
+        <span>Kết nối Shopee</span>
+        <span id="nav-shopee-badge" class="nav-badge nav-badge-warn" hidden>!</span>
+      </a>
+      <a href="#cai-dat" data-view="cai-dat">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+        <span>Cài đặt &amp; nhật ký</span>
+      </a>
+    </nav>
+
+    <main id="view" class="view" tabindex="-1"></main>
+  </div>
+
+  <!-- Hộp xác nhận dùng chung -->
+  <dialog id="confirm-dialog" class="dialog" aria-labelledby="confirm-title">
+    <form method="dialog" class="dialog-body">
+      <h2 id="confirm-title"></h2>
+      <p id="confirm-text"></p>
+      <div class="dialog-actions">
+        <button value="cancel" class="btn btn-ghost" type="submit">Hủy</button>
+        <button value="ok" id="confirm-ok" class="btn btn-primary" type="submit"></button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+</body>
+</html>

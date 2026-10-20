@@ -1,0 +1,91 @@
+# Chạy thật: gateway + worker + redis. Bí mật đặt trong ./secrets/<tên> (mỗi file một giá trị, chmod 600).
+# Gateway chỉ nghe trên 127.0.0.1; đưa ra Internet qua Cloudflare Tunnel (không mở cổng tường lửa).
+x-hardening: &hardening
+  read_only: true
+  tmpfs: ["/tmp"]
+  cap_drop: ["ALL"]
+  security_opt: ["no-new-privileges:true"]
+  restart: unless-stopped
+
+x-bot-env: &bot-env
+  ZALO_APP_ID: ${ZALO_APP_ID}
+  ZALO_OA_ID: ${ZALO_OA_ID}
+  SHOPEE_APP_ID: ${SHOPEE_APP_ID:-}
+  SHOPEE_WEB_FALLBACK: ${SHOPEE_WEB_FALLBACK:-0}
+  SUB_ID_CAMPAIGN: ${SUB_ID_CAMPAIGN:-}
+  ZALO_OA_SECRET_FILE: /run/secrets/zalo_oa_secret
+  ZALO_APP_SECRET_FILE: /run/secrets/zalo_app_secret
+  ZALO_REFRESH_TOKEN_FILE: /run/secrets/zalo_refresh_token
+  SHOPEE_APP_SECRET_FILE: /run/secrets/shopee_app_secret
+  DATA_KEY_FILE: /run/secrets/data_key
+  USER_HASH_KEY_FILE: /run/secrets/user_hash_key
+  WEBHOOK_PATH_SECRET_FILE: /run/secrets/webhook_path_secret
+  ADMIN_PASSWORD_HASH_FILE: /run/secrets/admin_password_hash
+  REDIS_URL_FILE: /run/secrets/redis_url
+
+x-bot-secrets: &bot-secrets
+  - zalo_oa_secret
+  - zalo_app_secret
+  - zalo_refresh_token
+  - shopee_app_secret
+  - data_key
+  - user_hash_key
+  - webhook_path_secret
+  - admin_password_hash
+  - redis_url
+
+services:
+  redis:
+    image: redis:7.4-alpine
+    <<: *hardening
+    command: ["sh", "-c", "exec redis-server --requirepass \"$$(cat /run/secrets/redis_password)\" --save '' --appendonly no"]
+    secrets: [redis_password]
+    networks: [internal]
+
+  gateway:
+    build: .
+    <<: *hardening
+    environment:
+      <<: *bot-env
+      ROLE: gateway
+      # 8090: chỉ có webhook — cổng duy nhất được đưa ra Internet qua Cloudflare Tunnel
+      # 8091: chỉ có trang quản trị — vào bằng SSH tunnel (ssh -L 8091:127.0.0.1:8091 server)
+      ADMIN_PORT: "8091"
+      ADMIN_HOST: 0.0.0.0
+      ADMIN_ALLOWED_CIDRS: 127.0.0.1/32,172.16.0.0/12
+    secrets: *bot-secrets
+    volumes: ["botdata:/srv/data"]
+    ports: ["127.0.0.1:8090:8090", "127.0.0.1:8091:8091"]
+    networks: [internal, egress]
+    depends_on: [redis]
+
+  worker:
+    build: .
+    <<: *hardening
+    environment:
+      <<: *bot-env
+      ROLE: worker
+    secrets: *bot-secrets
+    volumes: ["botdata:/srv/data"]
+    networks: [internal, egress]
+    depends_on: [redis]
+
+networks:
+  internal:
+    internal: true      # redis không có đường ra Internet
+  egress: {}
+
+volumes:
+  botdata: {}
+
+secrets:
+  zalo_oa_secret:      { file: ./secrets/zalo_oa_secret }
+  zalo_app_secret:     { file: ./secrets/zalo_app_secret }
+  zalo_refresh_token:  { file: ./secrets/zalo_refresh_token }
+  shopee_app_secret:   { file: ./secrets/shopee_app_secret }
+  data_key:            { file: ./secrets/data_key }
+  user_hash_key:       { file: ./secrets/user_hash_key }
+  webhook_path_secret: { file: ./secrets/webhook_path_secret }
+  admin_password_hash: { file: ./secrets/admin_password_hash }
+  redis_url:           { file: ./secrets/redis_url }
+  redis_password:      { file: ./secrets/redis_password }

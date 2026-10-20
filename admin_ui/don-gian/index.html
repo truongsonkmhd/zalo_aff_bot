@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Quản lý Bot</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%231f5fd6%27/%3E%3Cpath d=%27M13.3 18.7a5.3 5.3 0 0 0 7.5 0l4-4a5.3 5.3 0 0 0-7.5-7.5l-1.3 1.3M18.7 13.3a5.3 5.3 0 0 0-7.5 0l-4 4a5.3 5.3 0 0 0 7.5 7.5l1.3-1.3%27 fill=%27none%27 stroke=%27white%27 stroke-width=%272.4%27 stroke-linecap=%27round%27/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/admin/don-gian/styles.css">
+  <script src="/admin/don-gian/app.js" defer></script>
+</head>
+<body>
+  <!-- Đăng nhập -->
+  <section id="login-view" class="login" hidden>
+    <form id="login-form" class="card login-card" autocomplete="off" novalidate>
+      <h1>Quản lý Bot Đổi Link</h1>
+      <input type="text" name="username" value="admin" autocomplete="username" hidden aria-hidden="true">
+      <label class="field">
+        <span>Mật khẩu quản trị</span>
+        <input id="login-password" type="password" autocomplete="current-password" required>
+      </label>
+      <p id="login-error" class="error" role="alert" hidden></p>
+      <button class="btn primary" type="submit">Đăng nhập</button>
+      <p id="login-setup" class="hint" hidden>
+        Chưa đặt mật khẩu. Chạy <code>python -m app.cli hash-password</code>, đặt <code>ADMIN_PASSWORD_HASH</code> rồi khởi động lại bot.
+      </p>
+    </form>
+  </section>
+
+  <!-- Trang chính -->
+  <div id="app" class="page" hidden>
+    <header class="top">
+      <h1>Quản lý Bot</h1>
+      <div class="top-actions">
+        <span id="updated" class="hint"></span>
+        <button id="refresh-btn" class="btn" type="button">Làm mới</button>
+        <a class="btn" href="/admin/">Bản đầy đủ</a>
+        <button id="logout-btn" class="btn" type="button">Đăng xuất</button>
+      </div>
+    </header>
+
+    <!-- 1. Trạng thái + nút bật/tắt -->
+    <section class="card status">
+      <span id="status-dot" class="dot" aria-hidden="true"></span>
+      <div class="status-text">
+        <strong id="status-title">Đang tải…</strong>
+        <span id="status-sub" class="hint"></span>
+      </div>
+      <button id="toggle-btn" class="btn big" type="button" disabled>…</button>
+    </section>
+
+    <!-- 2. Việc cần làm -->
+    <section class="card">
+      <h2>Cần chú ý</h2>
+      <ul id="todo" class="todo"></ul>
+    </section>
+
+    <!-- 3. Số liệu hôm nay -->
+    <section class="stats" aria-label="Số liệu">
+      <div class="card stat"><span>Link đổi hôm nay</span><b id="s-total">–</b></div>
+      <div class="card stat"><span>Thành công</span><b id="s-rate">–</b></div>
+      <div class="card stat"><span>Khách hôm nay</span><b id="s-users">–</b></div>
+      <div class="card stat"><span>Hoa hồng ghi nhận</span><b id="s-commission">–</b></div>
+    </section>
+
+    <div class="cols">
+      <!-- 4. Đơn hàng -->
+      <section class="card">
+        <div class="card-head">
+          <h2>Đơn hàng gần đây</h2>
+          <div class="row">
+            <label class="btn" for="csv-file">Tải file CSV</label>
+            <input id="csv-file" type="file" accept=".csv,text/csv" class="sr-only">
+            <button id="sync-btn" class="btn" type="button" hidden>Đồng bộ ngay</button>
+          </div>
+        </div>
+        <p id="orders-summary" class="hint"></p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Mã đơn</th><th>Ngày</th><th class="num">Giá trị</th><th class="num">Hoa hồng</th><th>Trạng thái</th></tr></thead>
+            <tbody id="orders"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 5. Lịch sử đổi link -->
+      <section class="card">
+        <h2>Link khách vừa đổi</h2>
+        <ul id="history" class="history"></ul>
+      </section>
+    </div>
+
+    <!-- 6. Kết nối Shopee -->
+    <section class="card">
+      <h2>Kết nối Shopee</h2>
+      <p id="shopee-mode" class="hint"></p>
+      <form id="cookie-form" class="cookie-form" hidden autocomplete="off">
+        <label class="field">
+          <span>Cookie affiliate.shopee.vn mới</span>
+          <textarea id="cookie" rows="3" placeholder="Dán toàn bộ cookie vào đây" spellcheck="false"></textarea>
+        </label>
+        <label class="field">
+          <span>csrf_token (nếu có)</span>
+          <input id="csrf" type="text" spellcheck="false">
+        </label>
+        <button class="btn primary" type="submit">Lưu cookie</button>
+        <p class="hint">Cookie được mã hóa khi lưu và không bao giờ hiện lại trên trang này.</p>
+      </form>
+    </section>
+  </div>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>

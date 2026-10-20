@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Tra cứu đơn hàng</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%231f5fd6%27/%3E%3Cpath d=%27M9 11h14l-1.5 13h-11z M12.5 11a3.5 3.5 0 0 1 7 0%27 fill=%27none%27 stroke=%27white%27 stroke-width=%272.2%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/tra-don/styles.css">
+  <script src="/tra-don/app.js" defer></script>
+</head>
+<body>
+  <main class="page">
+    <header class="head">
+      <span class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M6 7h12l-1 13H7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
+      </span>
+      <div>
+        <h1>Tra cứu đơn hàng</h1>
+        <p>Xem các đơn bạn đã đặt qua link của shop</p>
+      </div>
+    </header>
+
+    <ol class="steps" aria-label="Cách tra cứu">
+      <li>
+        <span class="step-num">1</span>
+        <div><strong>Lấy mã tra cứu</strong><span>Nhắn <code>/id</code> cho Zalo của shop. Shop sẽ gửi lại mã 10 ký tự dành riêng cho bạn.</span></div>
+      </li>
+      <li>
+        <span class="step-num">2</span>
+        <div><strong>Nhập mã vào ô bên dưới</strong><span>Dán mã tra cứu, hoặc nhập mã đơn hàng Shopee nếu chỉ muốn xem một đơn.</span></div>
+      </li>
+      <li>
+        <span class="step-num">3</span>
+        <div><strong>Bấm Tra cứu</strong><span>Danh sách đơn và trạng thái hiện ngay bên dưới.</span></div>
+      </li>
+    </ol>
+
+    <form id="lookup-form" class="search" autocomplete="off" novalidate>
+      <label for="q">Mã tra cứu hoặc mã đơn hàng</label>
+      <div class="search-row">
+        <input id="q" name="q" type="text" inputmode="text" autocapitalize="characters" spellcheck="false"
+               maxlength="40" placeholder="Ví dụ: K7Q2M9XP4D" aria-describedby="q-help" required>
+        <button id="submit" type="submit">Tra cứu</button>
+      </div>
+      <p id="q-help" class="help">Mã tra cứu chỉ dành cho bạn, đừng chia sẻ cho người khác.</p>
+    </form>
+
+    <section id="result" class="result" aria-live="polite"></section>
+
+    <footer class="foot">
+      Đơn thường hiện sau vài giờ kể từ lúc đặt. Chỉ các đơn mua qua link shop gửi trên Zalo mới được ghi nhận.
+    </footer>
+  </main>
+</body>
+</html>
